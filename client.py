@@ -1,6 +1,7 @@
 import socket
 
-CLIENT_REPL_PREFIX_STR = 'client: '
+CLIENT_INPUT_COMMAND_PREFIX_STR = 'Input command: '
+CLIENT_INPUT_REPL_PREFIX_STR = 'client: '
 BUFFER_SIZE = 4096
 
 class ClientSocket:
@@ -23,8 +24,7 @@ if __name__ == '__main__':
   client_socket = ClientSocket('172.27.160.121', 16011)
 
   while True:
-    command = input(CLIENT_REPL_PREFIX_STR)
-    
+    command = input(CLIENT_INPUT_COMMAND_PREFIX_STR)
     if command == 'POST_STRING':
       #TODO: implement
       continue
