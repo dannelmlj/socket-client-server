@@ -13,12 +13,15 @@ INITIALIZE_SOCKET_HEADER_STR = '---------- Initialize Socket ----------'
 INPUT_COMMAND_HEADER_STR = '---------- Input Command ----------'
 NEXT_COMMAND_HEADER_STR = '---------- Next Command ----------'
 POST_STRING_COMMAND_HEADER_STR = "---------- Post String Command (Type a single '&' to end) ----------"
+GET_COMMAND_HEADER_STR = "---------------- Get Command ---------------"
 
 # Utility Strings
 ERROR_STR = 'Error: '
 DIVIDER_STR = '------'
 CONNECT_STATUS_STR = 'Connect status: '
 SEND_STATUS_STR = 'Send status: '
+
+RECEIVED_MESSAGE_STR = '---Received message--- '
 
 # Message Strings
 POST_FILE_ERROR_FILE_NOT_FOUND_MSG = 'Error: File not found'
@@ -95,9 +98,23 @@ if __name__ == '__main__':
       continue
 
     if command == 'GET':
+      print(GET_COMMAND_HEADER_STR)
+      print(RECEIVED_MESSAGE_STR)
+      client_socket.send(command)
+      get_string_msg = ''
+      while (get_string_msg != 'server: &'):
+        get_string_msg = client_socket.recv().decode('utf-8')
+        print(get_string_msg)
+        if (get_string_msg == 'server: &'):
+          print (DIVIDER_STR)
+          print (f'IP Address: {ip_address}, Port Number: {port_number}')
+          print (DIVIDER_STR)
+      firstCommand = False
       continue
 
     if command == 'EXIT':
+      client_socket.send(command)
+      print(client_socket.recv().decode('utf-8'))
       client_socket.close()
       break
     
