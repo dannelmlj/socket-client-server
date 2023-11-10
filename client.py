@@ -62,9 +62,12 @@ class BulletinBoardCommands:
       bulletin_board_client.send(post_string_msg)
       message_count += 1
       if (post_string_msg == '&'):
-        print(bulletin_board_client.recv())
+        send_status = bulletin_board_client.recv()
+        print(send_status)
         print(DIVIDER_STR)
         print(f'Sent {message_count} messages to (IP Address: {bulletin_board_client.host}, Port Number: {bulletin_board_client.port})')
+        print(f'{CONNECT_STATUS_STR}OK') if send_status == 'server: OK' else print(f'{CONNECT_STATUS_STR}ERROR')
+        print(f'{SEND_STATUS_STR}OK') if send_status == 'server: OK' else print(f'{SEND_STATUS_STR}ERROR')
         print(DIVIDER_STR)
 
   @staticmethod
@@ -121,6 +124,8 @@ class BulletinBoardCommands:
       if (get_string_msg == 'server: &'):
         print(DIVIDER_STR)
         print(f'IP Address: {bulletin_board_client.host}, Port Number: {bulletin_board_client.port}')
+        print(f'{CONNECT_STATUS_STR}OK')
+        print(f'{SEND_STATUS_STR}OK')
         print(DIVIDER_STR)
 
   @staticmethod
