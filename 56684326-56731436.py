@@ -83,8 +83,6 @@ class BulletinBoardCommands:
     print(bulletin_board_client.recv())
 
     file_path = input(CLIENT_INPUT_REPL_PREFIX_STR)
-    file_size = os.stat(file_path).st_size
-    file_header = struct.pack('128sl', bytes(file_path, encoding='utf-8'), file_size)
 
     if not os.path.isfile(file_path):
       print(ERROR_POST_FILE_FILE_NOT_FOUND_STR)
@@ -92,12 +90,15 @@ class BulletinBoardCommands:
       print(bulletin_board_client.recv())
       return
     
+    file_size = os.stat(file_path).st_size
+    
     if file_size > MAXIMUM_FILE_SIZE_IN_BYTES:
       print(ERROR_POST_FILE_SIZE_EXCEED_STR)
       bulletin_board_client.send('close')
       bulletin_board_client.recv()
       return
     
+    file_header = struct.pack('128sl', bytes(file_path, encoding='utf-8'), file_size)
     bulletin_board_client.socket.send(file_header)
     with open(file_path, 'rb') as file:
       file_data = file.read(MAXIMUM_FILE_SIZE_IN_BYTES)
