@@ -2,6 +2,9 @@ import os
 import socket
 import struct
 
+'''
+  Constants
+'''
 # Input Prefix Strings
 CLIENT_INPUT_IP_ADDRESS_PREFIX_STR  = "Input IP Address: "
 CLIENT_INPUT_PORT_NUMBER_PREFIX_STR = "Input port number: "
@@ -32,7 +35,29 @@ BUFFER_SIZE = 4096
 class BulletinBoardCommands:
   @staticmethod
   def post_string(bulletin_board_client):
+    ''' Post_string command.
+        This command allows client to send a text file to the server line by line. 
+        The client must type the text (using the standard input) line-by-line. 
+        The first line is the command itself (i.e. POST_STRING) and subsequent lines are treated as the text. 
+        The end of the text input is signalled by  a special symbol  &. 
+
+        Keyword arguments:
+        bulletin_board_client -- BulletinBoardClient object to send the message to the server through the socket
+    '''
     bulletin_board_client.send('POST_STRING')
+    print(POST_STRING_COMMAND_HEADER_STR)
+    post_string_msg = ''
+    message_count = 0;
+    while (post_string_msg != '&'):
+      post_string_msg = input(CLIENT_INPUT_REPL_PREFIX_STR)
+      bulletin_board_client.send(post_string_msg)
+      message_count += 1
+      if (post_string_msg == '&'):
+        print(bulletin_board_client.recv().decode('utf-8'))
+        print(DIVIDER_STR)
+        print(f'Sent {message_count} messages to (IP Address: {bulletin_board_client.host}, Port Number: {bulletin_board_client.port})')
+        print(DIVIDER_STR)
+    # firstCommand = False
 
   @staticmethod
   def post_file(bulletin_board_client):
@@ -40,11 +65,38 @@ class BulletinBoardCommands:
 
   @staticmethod
   def get(bulletin_board_client):
+    ''' GET command.
+        This command will ask the server to send all previously posted messages (posted by POST_STRING command) by the client and other clients.
+        Outputs all the messages received from the server line by line.
+        
+        Keyword arguments:
+        bulletin_board_client -- BulletinBoardClient object to receive the message from the server through the socket
+    '''
     bulletin_board_client.send('GET')
+    print(GET_COMMAND_HEADER_STR)
+    print(RECEIVED_MESSAGE_STR)
+    get_string_msg = ''
+    while (get_string_msg != 'server: &'):
+      get_string_msg = bulletin_board_client.recv().decode('utf-8')
+      print(get_string_msg)
+      if (get_string_msg == 'server: &'):
+        print (DIVIDER_STR)
+        print (f'IP Address: {bulletin_board_client.host}, Port Number: {bulletin_board_client.port}')
+        print (DIVIDER_STR)
+    # firstCommand = False
 
   @staticmethod
   def exit(bulletin_board_client):
+    ''' EXIT command.
+        This command will ask the server to close the connection.
+        Outputs the server response.
+
+        Keyword arguments:
+        bulletin_board_client -- BulletinBoardClient object to send the exit command and receive the response from the server through the socket
+    '''
     bulletin_board_client.send('EXIT')
+    print(client_socket.recv().decode('utf-8'))
+    bulletin_board_client.close()
 
 class BulletinBoardClient:
   def __init__(self, host, port):
@@ -83,22 +135,6 @@ if __name__ == '__main__':
       print(NEXT_COMMAND_HEADER_STR)
     command = input(CLIENT_INPUT_COMMAND_PREFIX_STR)
   
-    if command == 'POST_STRING':
-      print(POST_STRING_COMMAND_HEADER_STR)
-      client_socket.send(command)
-      post_string_msg = ''
-      message_count = 0;
-      while (post_string_msg != '&'):
-        post_string_msg = input(CLIENT_INPUT_REPL_PREFIX_STR)
-        client_socket.send(post_string_msg)
-        message_count += 1
-        if (post_string_msg == '&'):
-          print(client_socket.z_recv().decode('utf-8'))
-          print(DIVIDER_STR)
-          print(f'Sent {message_count} messages to (IP Address: {ip_address}, Port Number: {port_number})')
-          print(DIVIDER_STR)
-      firstCommand = False
-      continue
 
     if command == 'POST_FILE':
       client_socket.send(command)
@@ -130,26 +166,8 @@ if __name__ == '__main__':
       firstCommand = False
       continue
 
-    if command == 'GET':
-      print(GET_COMMAND_HEADER_STR)
-      print(RECEIVED_MESSAGE_STR)
-      client_socket.send(command)
-      get_string_msg = ''
-      while (get_string_msg != 'server: &'):
-        get_string_msg = client_socket.z_recv().decode('utf-8')
-        print(get_string_msg)
-        if (get_string_msg == 'server: &'):
-          print (DIVIDER_STR)
-          print (f'IP Address: {ip_address}, Port Number: {port_number}')
-          print (DIVIDER_STR)
-      firstCommand = False
-      continue
 
-    if command == 'EXIT':
-      client_socket.send(command)
-      print(client_socket.z_recv().decode('utf-8'))
-      client_socket.close()
-      break
+      
     
     client_socket.send(command)
     print(client_socket.z_recv().decode('utf-8'))
