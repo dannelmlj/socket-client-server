@@ -1,5 +1,4 @@
 from enum import Enum
-from client import BulletinBoardClient
 
 class Commands(Enum):
   POST_STRING = 'POST_STRING'
@@ -8,7 +7,7 @@ class Commands(Enum):
   EXIT = 'EXIT'
 
 class BulletinBoardCommands:
-  def __init__(self, client_socket: BulletinBoardClient):
+  def __init__(self, client_socket):
     self.client_socket = client_socket
 
   def post_string(self):
