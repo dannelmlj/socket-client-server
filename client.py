@@ -3,7 +3,7 @@ import socket
 import struct
 from constants import *
 
-class ClientSocket:
+class BulletinBoardClient:
   def __init__(self, host, port):
     self.host = host
     self.port = port
@@ -23,7 +23,7 @@ if __name__ == '__main__':
   print(INITIALIZE_SOCKET_HEADER_STR)
   ip_address = input(CLIENT_INPUT_IP_ADDRESS_PREFIX_STR)
   port_number = int(input(CLIENT_INPUT_PORT_NUMBER_PREFIX_STR))
-  client_socket = ClientSocket(ip_address, port_number)
+  client_socket = BulletinBoardClient(ip_address, port_number)
 
   firstCommand = True
   while True:
