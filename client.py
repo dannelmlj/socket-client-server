@@ -26,6 +26,7 @@ RECEIVED_MESSAGE_STR = '---Received message--- '
 # Message Strings
 POST_FILE_ERROR_FILE_NOT_FOUND_MSG = 'Error: File not found'
 
+MAXIMUM_FILE_SIZE_IN_BYTES = 256
 BUFFER_SIZE = 4096
 
 class ClientSocket:
@@ -37,14 +38,6 @@ class ClientSocket:
   
   def send(self, message):
     self.socket.send(bytes(message, encoding='utf-8'))
-
-  def send_file(self, file_path):
-    file_header = struct.pack('128sl', bytes(file_path, encoding='utf-8'), os.stat(file_path).st_size)
-    self.socket.send(file_header)
-    file = open(file_path, 'rb')
-    file_data = file.read(256)
-    file.close()
-    self.socket.send(file_data)
 
   def recv(self):
     return self.socket.recv(BUFFER_SIZE)
@@ -88,10 +81,26 @@ if __name__ == '__main__':
       print(client_socket.recv().decode('utf-8'))
       file_path = input(CLIENT_INPUT_REPL_PREFIX_STR)
 
-      if os.path.isfile(file_path):
-        client_socket.send_file(file_path)
-      else:
-        client_socket.send(POST_FILE_ERROR_FILE_NOT_FOUND_MSG)
+      if not os.path.isfile(file_path):
+        print('Error: File not found')
+        client_socket.send('close')
+        print(client_socket.recv().decode('utf-8'))
+        firstCommand = False
+        continue
+        
+      if os.stat(file_path).st_size > MAXIMUM_FILE_SIZE_IN_BYTES:
+        print('Error: File size is too large')
+        client_socket.send('close')
+        print(client_socket.recv().decode('utf-8'))
+        firstCommand = False
+        continue
+
+      file_header = struct.pack('128sl', bytes(file_path, encoding='utf-8'), os.stat(file_path).st_size)
+      client_socket.socket.send(file_header)
+      file = open(file_path, 'rb')
+      file_data = file.read(MAXIMUM_FILE_SIZE_IN_BYTES)
+      file.close()
+      client_socket.socket.send(file_data)
 
       print(client_socket.recv().decode('utf-8'))
       firstCommand = False
