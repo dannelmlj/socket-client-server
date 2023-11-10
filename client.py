@@ -167,23 +167,22 @@ class BulletinBoardClient:
     self.socket.close()
 
 def main():
-  print(HEADER_INITIALIZE_SOCKET_STR)
-
-  ip_address = input(CLIENT_INPUT_IP_ADDRESS_PREFIX_STR)
-  port_number = int(input(CLIENT_INPUT_PORT_NUMBER_PREFIX_STR))
-
   connection_established = False
   while not connection_established:
     try:
+      print(HEADER_INITIALIZE_SOCKET_STR)
+      ip_address = input(CLIENT_INPUT_IP_ADDRESS_PREFIX_STR)
+      port_number = int(input(CLIENT_INPUT_PORT_NUMBER_PREFIX_STR))
+
       client_socket = BulletinBoardClient(ip_address, port_number)
       client_socket.initialize()
+
       connection_established = True
-    except (ConnectionError, ValueError, OverflowError) as e:
+    except Exception:
       print(ERROR_CONNECTION_FAIL_STR)
     
   sent_commands = 0
   while True:
-
     if not sent_commands:
       print(HEADER_INPUT_COMMAND_STR)
     else:
