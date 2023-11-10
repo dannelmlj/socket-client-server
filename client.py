@@ -1,14 +1,56 @@
 import os
 import socket
 import struct
-from constants import *
-from commands import BulletinBoardCommands
+
+# Input Prefix Strings
+CLIENT_INPUT_IP_ADDRESS_PREFIX_STR  = "Input IP Address: "
+CLIENT_INPUT_PORT_NUMBER_PREFIX_STR = "Input port number: "
+CLIENT_INPUT_COMMAND_PREFIX_STR     = "Input command: "
+CLIENT_INPUT_REPL_PREFIX_STR        = "client: "
+
+# Header Strings
+INITIALIZE_SOCKET_HEADER_STR        = "----------------------- Initialize Socket -----------------------"
+INPUT_COMMAND_HEADER_STR            = "------------------------- Input Command -------------------------"
+NEXT_COMMAND_HEADER_STR             = "------------------------- Next Command --------------------------"
+POST_STRING_COMMAND_HEADER_STR      = "--------- Post String Command (Type a single '&' to end) --------"
+GET_COMMAND_HEADER_STR              = "-------------------------- Get Command --------------------------"
+
+# Message Strings
+CONNECT_STATUS_STR                  = "Connect status: "
+SEND_STATUS_STR                     = "Send status: "
+RECEIVED_MESSAGE_STR                = "---Received messages---"
+POST_FILE_ERROR_FILE_NOT_FOUND_MSG  = "Error: File not found"
+CONNECTION_FAIL_NOT_BUILT_MSG       = "Error: Connection is not built, please try again"
+
+# Utility Strings
+DIVIDER_STR                         = "------"
+
+# Size Constants
+MAXIMUM_FILE_SIZE_IN_BYTES = 256
+BUFFER_SIZE = 4096
+
+class BulletinBoardCommands:
+  @staticmethod
+  def post_string(bulletin_board_client):
+    bulletin_board_client.send('POST_STRING')
+
+  @staticmethod
+  def post_file(bulletin_board_client):
+    bulletin_board_client.send('POST_FILE')
+
+  @staticmethod
+  def get(bulletin_board_client):
+    bulletin_board_client.send('GET')
+
+  @staticmethod
+  def exit(bulletin_board_client):
+    bulletin_board_client.send('EXIT')
+
 class BulletinBoardClient:
   def __init__(self, host, port):
     self.host = host
     self.port = port
     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    self.commands = BulletinBoardCommands(self)
 
   def initialize(self):
     self.socket.connect((self.host, self.port))
